@@ -39,6 +39,8 @@ def train_model (model, train_loader, n_epochs=2):
 
     criterion = nn.CrossEntropyLoss()
 
+    train_loss_history = []
+
     for epoch in range(n_epochs):
         running_loss = 0.0
         correct = 0
@@ -63,17 +65,18 @@ def train_model (model, train_loader, n_epochs=2):
             optimizer.step()
 
             running_loss += loss.item() * B
-            print (f"Running loss = {running_loss}")
+            #print (f"Running loss = {running_loss}")
             _, preds = logits.max(1)
             correct += preds.eq(labels).sum().item()
             total += B
 
         avg_loss = running_loss / total
+        train_loss_history.append (avg_loss)
         acc = correct / total * 100.0
         #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
         print(f"Task  | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
 
-        return model
+    return model, train_loss_history
 
 
 
@@ -100,7 +103,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 mlp = MLP().to(device)
 
 
-mlp = train_model(model=mlp, train_loader=train_loader)
+mlp, train_loss_history = train_model(model=mlp, train_loader=train_loader)
+
+print (train_loss_history)
 
 
 
