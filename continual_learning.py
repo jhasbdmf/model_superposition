@@ -20,7 +20,7 @@ class MLP(nn.Module):
         self.fc2 = nn.Linear(hidden1, hidden2)
         self.fc_out = nn.ModuleList()
         for i in range(n_tasks):
-            self.fc_out[i] = nn.Linear(hidden2, num_classes)
+            self.fc_out.append(nn.Linear(hidden2, num_classes)) 
 
         if superposition:
             self.context1 = torch.randint(0, 2, (n_tasks, hidden1)) * 2 - 1
