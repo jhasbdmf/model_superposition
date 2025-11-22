@@ -71,6 +71,8 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, pca
 
     train_loss_history = []
 
+    pca_batch_penultimate_logits = []
+
     for run in range(1):
 
 
@@ -121,7 +123,16 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, pca
                 #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
                 print(f"Task {t+1} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
 
-            #if t==0:
+            
+            
+
+            if t==0 or t==5 or t==9:
+                for images, labels in pca_instances_loader:
+                    _, pca_batch_penultimate = model.forward(inputs = images, 
+                                                                task_id = t,
+                                                                get_penultimate_logits = True)
+                    
+                    pca_batch_penultimate_logits.append(apply_pca_to_batch(pca_batch_penultimate))
                 
             #elif t==5:
             
@@ -134,7 +145,7 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, pca
             
     model.eval()
 
-    return model, train_loss_history
+    return model, train_loss_history, pca_batch_penultimate_logits
 
 
 
@@ -164,7 +175,7 @@ def evaluate(model, loader, perm, task_id):
 
 def apply_pca_to_batch(tensors, n_components=2):
     tensor_cpu = tensors.to('cpu')
-    np_array = tensor_cpu.numpy()
+    np_array = tensor_cpu.detach().numpy()
     flat_array = np_array.reshape(np_array.shape[0], -1)  # batch size x features
     pca = PCA(n_components=n_components)
     return pca.fit_transform(flat_array)
@@ -238,7 +249,7 @@ print ("NO SUPERPOSITION")
 mlp1 = MLP(n_tasks=n_tasks).to(device)
 
 
-mlp1, train_loss_history = train_model(model=mlp1, 
+mlp1, train_loss_history, penultimate_logits = train_model(model=mlp1, 
                                        train_loader=train_loader, 
                                        test_loader=test_loader, 
                                        permutations=permutations,
@@ -246,18 +257,22 @@ mlp1, train_loss_history = train_model(model=mlp1,
                                        batch_size=batch_size, 
                                        n_tasks = n_tasks)
 
+
 print ("_"*50)
 print (train_loss_history)
 
 
 print ("_"*50)
 
+print (penultimate_logits)
+
+'''
 print ("SUPERPOSITION")
 
 mlp2 = MLP(superposition=True, n_tasks=n_tasks).to(device)
 
 
-mlp2, train_loss_history = train_model(model=mlp2, 
+mlp2, train_loss_history, _ = train_model(model=mlp2, 
                                        train_loader=train_loader, 
                                        test_loader=test_loader, 
                                        permutations=permutations,
@@ -271,7 +286,7 @@ print (train_loss_history)
 
 print ("_"*100)
 
-
+'''
 
 
 
