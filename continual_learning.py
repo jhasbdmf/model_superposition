@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.nn as nn
+from sklearn.decomposition import PCA
+import numpy as np
 
 
 
@@ -19,7 +21,7 @@ class MLP(nn.Module):
         self.fc1 = nn.Linear(input_dim, hidden1)
         self.fc2 = nn.Linear(hidden1, hidden2)
         self.fc_out = nn.ModuleList()
-        for i in range(n_tasks):
+        for _ in range(n_tasks):
             self.fc_out.append(nn.Linear(hidden2, num_classes)) 
 
         if superposition:
@@ -81,6 +83,9 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, n_e
                     images = images.to(device)   # (B, 1, 28, 28)
                     labels = labels.to(device)   # (B,)
 
+                    print ("PCA ", apply_pca_to_batch(images))
+
+
                     # Flatten and permute pixels
                     B = images.size(0)
                     images = images.view(B, -1)         # (B, 784)
@@ -121,6 +126,15 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, n_e
 
 
 
+def apply_pca_to_batch(tensors, n_components=2):
+    tensor_cpu = tensors.to('cpu')
+    np_array = tensor_cpu.numpy()
+    flat_array = np_array.reshape(np_array.shape[0], -1)  # batch size x features
+    pca = PCA(n_components=n_components)
+    return pca.fit_transform(flat_array)
+
+
+
 
 def evaluate(model, loader, perm, task_id):
     model.eval()
@@ -154,12 +168,17 @@ train_set = datasets.MNIST(
     transform=transforms.ToTensor()
 )
 
+
+
 test_set = datasets.MNIST(
     root="./data",
     train=False,
     download=True,
     transform=transforms.ToTensor()
 )
+
+
+
 
 batch_size = 128
 n_tasks = 10
@@ -169,6 +188,8 @@ input_dim = 784
 permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
 
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+
+
 
 test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
@@ -241,9 +262,3 @@ print ("_"*100)
 
 
 
-print (type(test_set))
-print (type(test_set[0]))
-print (len(test_set))
-print (type(test_set[0][0]))
-print (test_set[0][0].shape)
-print (type(test_set[1]))
