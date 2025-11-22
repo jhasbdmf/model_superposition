@@ -44,40 +44,44 @@ def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
 
     train_loss_history = []
 
-    for epoch in range(n_epochs):
-        running_loss = 0.0
-        correct = 0
-        total = 0
+    for t in range(n_tasks):
 
-        for images, labels in train_loader:
-            images = images.to(device)   # (B, 1, 28, 28)
-            labels = labels.to(device)   # (B,)
+        for epoch in range(n_epochs):
+            running_loss = 0.0
+            correct = 0
+            total = 0
 
-            # Flatten and permute pixels
-            B = images.size(0)
-            images = images.view(B, -1)         # (B, 784)
-            images = images[:, permutations[0]]            # (B, 784) permuted
+            for images, labels in train_loader:
+                images = images.to(device)   # (B, 1, 28, 28)
+                labels = labels.to(device)   # (B,)
 
-            # Forward
-            logits = model(images)
-            loss = criterion(logits, labels)
+                # Flatten and permute pixels
+                B = images.size(0)
+                images = images.view(B, -1)         # (B, 784)
+                images = images[:, permutations[t]]            # (B, 784) permuted
 
-            # Backward
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+                # Forward
+                logits = model(images)
+                loss = criterion(logits, labels)
 
-            running_loss += loss.item() * B
-            #print (f"Running loss = {running_loss}")
-            _, preds = logits.max(1)
-            correct += preds.eq(labels).sum().item()
-            total += B
+                # Backward
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-        avg_loss = running_loss / total
-        train_loss_history.append (avg_loss)
-        acc = correct / total * 100.0
-        #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
-        print(f"Task  | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+                running_loss += loss.item() * B
+                #print (f"Running loss = {running_loss}")
+                _, preds = logits.max(1)
+                correct += preds.eq(labels).sum().item()
+                total += B
+
+            avg_loss = running_loss / total
+            train_loss_history.append (avg_loss)
+            acc = correct / total * 100.0
+            #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+            print(f"Task {t+1} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+        
+    model.eval()
 
     return model, train_loss_history
 
