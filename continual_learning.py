@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=32, hidden2=64, num_classes = 10):
+    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=128, hidden2=128, num_classes = 10):
 
 
         super().__init__()
