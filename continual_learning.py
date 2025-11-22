@@ -50,7 +50,7 @@ class MLP(nn.Module):
         return logits
     
 
-def train_model (model, train_loader, test_loader, batch_size, permutations, n_epochs=1, n_tasks = 5):
+def train_model (model, train_loader, test_loader, batch_size, permutations, pca_instances_loader=None, n_epochs=1, n_tasks = 5):
 
    
         
@@ -83,7 +83,7 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, n_e
                     images = images.to(device)   # (B, 1, 28, 28)
                     labels = labels.to(device)   # (B,)
 
-                    print ("PCA ", apply_pca_to_batch(images))
+                    #print ("PCA ", apply_pca_to_batch(images))
 
 
                     # Flatten and permute pixels
@@ -126,12 +126,7 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, n_e
 
 
 
-def apply_pca_to_batch(tensors, n_components=2):
-    tensor_cpu = tensors.to('cpu')
-    np_array = tensor_cpu.numpy()
-    flat_array = np_array.reshape(np_array.shape[0], -1)  # batch size x features
-    pca = PCA(n_components=n_components)
-    return pca.fit_transform(flat_array)
+
 
 
 
@@ -154,9 +149,40 @@ def evaluate(model, loader, perm, task_id):
             total += B
     return correct / total * 100.0
 
+def apply_pca_to_batch(tensors, n_components=2):
+    tensor_cpu = tensors.to('cpu')
+    np_array = tensor_cpu.numpy()
+    flat_array = np_array.reshape(np_array.shape[0], -1)  # batch size x features
+    pca = PCA(n_components=n_components)
+    return pca.fit_transform(flat_array)
 
 
 
+def get_PCA_instances_loader (train_set, positive_label = 1, negative_label = 0, n_samples_per_class = 10):
+
+
+
+    # Collect indices for 10 positive and 10 negative examples
+    positive_indices = []
+    negative_indices = []
+
+    for idx, (_, label) in enumerate(train_set):
+        if label == positive_label and len(positive_indices) < n_samples_per_class:
+            positive_indices.append(idx)
+        elif label == negative_label and len(negative_indices) < n_samples_per_class:
+            negative_indices.append(idx)
+
+        if len(positive_indices) == n_samples_per_class and len(negative_indices) == n_samples_per_class:
+            break
+
+    subset_indices = positive_indices + negative_indices
+
+    # Create subset and DataLoader to batch all 20 samples together
+    subset_train_set = Subset(train_set, subset_indices)
+    print (subset_train_set)
+    subset_loader = DataLoader(subset_train_set, batch_size=n_samples_per_class*2, shuffle=False)
+
+    return subset_loader
 
         
 
@@ -168,7 +194,8 @@ train_set = datasets.MNIST(
     transform=transforms.ToTensor()
 )
 
-
+pca_instances_loader = get_PCA_instances_loader(train_set=train_set)
+#print (apply_pca_to_batch(pca_instances_loader))
 
 test_set = datasets.MNIST(
     root="./data",
