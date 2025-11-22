@@ -109,7 +109,7 @@ def train_model (model, train_loader, test_loader, batch_size, n_epochs=1, n_tas
 
 
             # Inside the task loop, after training:
-            test_acc = evaluate(model, test_loader, permutations[t])
+            test_acc = evaluate(model, test_loader, permutations[t], t)
             print(f"Task {t+1} | Test accuracy on its own permutation: {test_acc:.2f}%")
             
     model.eval()
@@ -120,7 +120,7 @@ def train_model (model, train_loader, test_loader, batch_size, n_epochs=1, n_tas
 
 
 
-def evaluate(model, loader, perm):
+def evaluate(model, loader, perm, task_id):
     model.eval()
     correct = 0
     total = 0
@@ -132,7 +132,7 @@ def evaluate(model, loader, perm):
             images = images.view(B, -1)
             images = images[:, perm]
 
-            logits = model(images)
+            logits = model(images, task_id)
             _, preds = logits.max(1)
             correct += preds.eq(labels).sum().item()
             total += B
