@@ -109,8 +109,8 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, n_e
 
 
             # Inside the task loop, after training:
-            test_acc = evaluate(model, test_loader, permutations[t], t)
-            print(f"Task {t+1} | Test accuracy on its own permutation: {test_acc:.2f}%")
+            test_acc = evaluate(model, test_loader, permutations[t], 0)
+            print(f"Task {1} | Test accuracy on its own permutation: {test_acc:.2f}%")
             
     model.eval()
 
@@ -188,11 +188,11 @@ mlp1, train_loss_history = train_model(model=mlp1,
 print ("_"*50)
 print (train_loss_history)
 
-print ("_"*50)
+#print ("_"*50)
 
 
-for i in range(n_tasks):
-    evaluate(mlp1, test_loader, permutations, i)
+#for i in range(n_tasks):
+    #evaluate(mlp1, test_loader, permutations, i)
 
 print ("_"*50)
 
@@ -211,11 +211,11 @@ mlp2, train_loss_history = train_model(model=mlp2,
 print ("_"*50)
 print (train_loss_history)
 
-print ("_"*50)
+#print ("_"*50)
 
 
-for i in range(n_tasks):
-    evaluate(mlp2, test_loader, permutations, i)
+#for i in range(n_tasks):
+#    evaluate(mlp2, test_loader, permutations, i)
 
 print ("_"*100)
 
