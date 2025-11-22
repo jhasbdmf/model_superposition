@@ -175,7 +175,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print ("_"*100)
 print ("NO SUPERPOSITION")
 
-mlp1 = MLP().to(device)
+mlp1 = MLP(n_tasks=n_tasks).to(device)
 
 
 mlp1, train_loss_history = train_model(model=mlp1, 
@@ -198,7 +198,7 @@ print ("_"*50)
 
 print ("SUPERPOSITION")
 
-mlp2 = MLP(superposition=True).to(device)
+mlp2 = MLP(superposition=True, n_tasks=n_tasks).to(device)
 
 
 mlp2, train_loss_history = train_model(model=mlp2, 
