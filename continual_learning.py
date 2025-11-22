@@ -46,7 +46,7 @@ class MLP(nn.Module):
         return logits
     
 
-def train_model (model, train_loader, test_loader, batch_size, n_epochs=1, n_tasks = 5):
+def train_model (model, train_loader, test_loader, batch_size, n_epochs=5, n_tasks = 10):
 
     permutations = torch.stack([torch.randperm(model.input_dim) for _ in range(n_tasks)])
         
@@ -159,7 +159,7 @@ test_set = datasets.MNIST(
     transform=transforms.ToTensor()
 )
 
-batch_size = 32
+batch_size = 128
 
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 
