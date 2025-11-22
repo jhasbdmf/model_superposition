@@ -29,8 +29,10 @@ class MLP(nn.Module):
         flattened_inputs = inputs.reshape(inputs.size(0),-1)
         logits = F.relu(self.fc1(flattened_inputs))
 
-        #print (logits.shape)
+        
         if self.superposition:
+            #print (logits.shape)
+            #print (self.context1.shape)
             logits = logits * self.context1[task_id]
 
         logits = F.relu(self.fc2(logits))
@@ -77,8 +79,9 @@ def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
                 images = images.view(B, -1)         # (B, 784)
                 images = images[:, permutations[t]]            # (B, 784) permuted
 
-                # Forward
-                logits = model(images)
+              
+             
+                logits = model(images, t)
                 loss = criterion(logits, labels)
 
                 # Backward
@@ -125,12 +128,28 @@ train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=False)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-mlp = MLP().to(device)
+print ("_"*100)
+print ("NO SUPERPOSITION")
+
+mlp1 = MLP().to(device)
 
 
-mlp, train_loss_history = train_model(model=mlp, train_loader=train_loader, batch_size=batch_size)
+mlp1, train_loss_history = train_model(model=mlp1, train_loader=train_loader, batch_size=batch_size)
 
 print (train_loss_history)
+
+print ("_"*50)
+
+print ("SUPERPOSITION")
+
+mlp2 = MLP(superposition=True).to(device)
+
+
+mlp2, train_loss_history = train_model(model=mlp2, train_loader=train_loader, batch_size=batch_size)
+
+print (train_loss_history)
+
+print ("_"*100)
 
 
 
