@@ -109,7 +109,7 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, n_e
 
 
             # Inside the task loop, after training:
-            test_acc = evaluate(model, test_loader, permutations[t], 0)
+            test_acc = evaluate(model, test_loader, permutations[0], 0)
             print(f"Task {1} | Test accuracy on its own permutation: {test_acc:.2f}%")
             
     model.eval()
