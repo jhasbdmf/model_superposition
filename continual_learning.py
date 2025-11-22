@@ -173,7 +173,7 @@ print ("NO SUPERPOSITION")
 mlp1 = MLP().to(device)
 
 
-mlp1, train_loss_history = train_model(model=mlp1, train_loader=train_loader, batch_size=batch_size)
+mlp1, train_loss_history = train_model(model=mlp1, train_loader=train_loader, test_loader=test_loader, batch_size=batch_size)
 
 print ("_"*50)
 print (train_loss_history)
@@ -185,7 +185,7 @@ print ("SUPERPOSITION")
 mlp2 = MLP(superposition=True).to(device)
 
 
-mlp2, train_loss_history = train_model(model=mlp2, train_loader=train_loader, batch_size=batch_size)
+mlp2, train_loss_history = train_model(model=mlp2, train_loader=train_loader, test_loader=test_loader, batch_size=batch_size)
 
 print ("_"*50)
 print (train_loss_history)
