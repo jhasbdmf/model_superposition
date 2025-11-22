@@ -12,6 +12,7 @@ import torch.nn as nn
 class MLP(nn.Module):
     def __init__(self, input_dim = 28*28, hidden1=256, hidden2=256, num_classes = 10):
         super().__init__()
+        self.input_dim = input_dim
         self.fc1 = nn.Linear(input_dim, hidden1)
         self.fc2 = nn.Linear(hidden1, hidden2)
         self.fc_out = nn.Linear(hidden2, num_classes)
@@ -26,7 +27,9 @@ class MLP(nn.Module):
         return logits
     
 
-def train_model (model, train_loader, n_epochs=2):
+def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
+
+    permutations = torch.stack([torch.randperm(model.input_dim) for _ in range(n_tasks)])
         
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -53,7 +56,7 @@ def train_model (model, train_loader, n_epochs=2):
             # Flatten and permute pixels
             B = images.size(0)
             images = images.view(B, -1)         # (B, 784)
-            #images = images[:, perm]            # (B, 784) permuted
+            images = images[:, permutations[0]]            # (B, 784) permuted
 
             # Forward
             logits = model(images)
@@ -94,16 +97,16 @@ train_set = datasets.MNIST(
     transform=transforms.ToTensor()
 )
 
+batch_size = 32
 
-
-train_loader = DataLoader(train_set, batch_size=32, shuffle=False)
+train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=False)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 mlp = MLP().to(device)
 
 
-mlp, train_loss_history = train_model(model=mlp, train_loader=train_loader)
+mlp, train_loss_history = train_model(model=mlp, train_loader=train_loader, batch_size=batch_size)
 
 print (train_loss_history)
 
