@@ -266,9 +266,9 @@ print ("_"*50)
 
 print (penultimate_logits)
 
-plt.scatter(penultimate_logits[0, :, 0], penultimate_logits[0, :, 1], c='red', label='Class 1')
-plt.scatter(penultimate_logits[1, :, 0], penultimate_logits[1, :, 1], c='blue', label='Class 2')
-plt.scatter(penultimate_logits[2,:, 0], penultimate_logits[2, :, 1], c='green', label='Class 3')
+plt.scatter(penultimate_logits[0][:, 0], penultimate_logits[0][:, 1], c='red', label='Class 1')
+plt.scatter(penultimate_logits[1][:, 0], penultimate_logits[1][:, 1], c='blue', label='Class 2')
+plt.scatter(penultimate_logits[2][:, 0], penultimate_logits[2][:, 1], c='green', label='Class 3')
 
 plt.legend()
 plt.xlabel('X-axis')
