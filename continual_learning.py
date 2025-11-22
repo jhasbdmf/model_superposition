@@ -46,7 +46,7 @@ class MLP(nn.Module):
         return logits
     
 
-def train_model (model, train_loader, test_loader, batch_size, permutations, n_epochs=2, n_tasks = 5):
+def train_model (model, train_loader, test_loader, batch_size, permutations, n_epochs=1, n_tasks = 5):
 
    
         
