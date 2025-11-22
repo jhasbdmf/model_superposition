@@ -28,7 +28,7 @@ class MLP(nn.Module):
             self.context1 = torch.randint(0, 2, (n_tasks, hidden1)) * 2 - 1
             self.context2 = torch.randint(0, 2, (n_tasks, hidden2)) * 2 - 1
 
-    def forward(self, inputs, task_id=None, targets=None):
+    def forward(self, inputs, task_id=None, get_penultimate_logits = False, targets=None):
 
         flattened_inputs = inputs.reshape(inputs.size(0),-1)
         logits = F.relu(self.fc1(flattened_inputs))
@@ -44,18 +44,26 @@ class MLP(nn.Module):
         if self.superposition:
             logits = logits * self.context2[task_id]
 
+        if not get_penultimate_logits:
 
-        logits = self.fc_out[task_id](logits)
+            logits = self.fc_out[task_id](logits)
 
-        return logits
+            return logits
+        
+        else:
+
+            penultimate_logits = logits
+
+            logits = self.fc_out[task_id](logits)
+
+            return logits, penultimate_logits
+
+
     
 
 def train_model (model, train_loader, test_loader, batch_size, permutations, pca_instances_loader=None, n_epochs=1, n_tasks = 5):
 
    
-        
-
-
     model.train()
 
 
@@ -113,6 +121,11 @@ def train_model (model, train_loader, test_loader, batch_size, permutations, pca
                 #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
                 print(f"Task {t+1} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
 
+            #if t==0:
+                
+            #elif t==5:
+            
+            #elif t==9:
 
 
             # Inside the task loop, after training:
@@ -159,9 +172,6 @@ def apply_pca_to_batch(tensors, n_components=2):
 
 
 def get_PCA_instances_loader (train_set, positive_label = 1, negative_label = 0, n_samples_per_class = 10):
-
-
-
     # Collect indices for 10 positive and 10 negative examples
     positive_indices = []
     negative_indices = []
@@ -232,17 +242,13 @@ mlp1, train_loss_history = train_model(model=mlp1,
                                        train_loader=train_loader, 
                                        test_loader=test_loader, 
                                        permutations=permutations,
+                                       pca_instances_loader=pca_instances_loader,
                                        batch_size=batch_size, 
                                        n_tasks = n_tasks)
 
 print ("_"*50)
 print (train_loss_history)
 
-#print ("_"*50)
-
-
-#for i in range(n_tasks):
-    #evaluate(mlp1, test_loader, permutations, i)
 
 print ("_"*50)
 
@@ -255,36 +261,17 @@ mlp2, train_loss_history = train_model(model=mlp2,
                                        train_loader=train_loader, 
                                        test_loader=test_loader, 
                                        permutations=permutations,
+                                       pca_instances_loader=pca_instances_loader,
                                        batch_size=batch_size,
                                        n_tasks = n_tasks)
 
 print ("_"*50)
 print (train_loss_history)
 
-#print ("_"*50)
-
-
-#for i in range(n_tasks):
-#    evaluate(mlp2, test_loader, permutations, i)
 
 print ("_"*100)
 
 
-
-#for epochs in range(n_epochs):
-
-#    for image, label in train_loader:
-#        batch_logits = mlp.forward(image)
-#        predicted_classes = torch.argmax(batch_logits, dim=1)
-#        print (predicted_classes)
-   
-
-   
-    
-
-#print (len(loader))
-
-#print (loader[1])
 
 
 
