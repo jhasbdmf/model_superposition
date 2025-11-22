@@ -4,6 +4,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import Subset
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
+import torch.nn as nn
 
 
 
@@ -22,6 +24,62 @@ class MLP(nn.Module):
         logits = self.fc_out(logits)
 
         return logits
+    
+
+def train_model (model, train_loader, n_epochs=2):
+        
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    model.train()
+
+
+    n_epochs = 2
+
+
+
+    criterion = nn.CrossEntropyLoss()
+
+    for epoch in range(n_epochs):
+        running_loss = 0.0
+        correct = 0
+        total = 0
+
+        for images, labels in train_loader:
+            images = images.to(device)   # (B, 1, 28, 28)
+            labels = labels.to(device)   # (B,)
+
+            # Flatten and permute pixels
+            B = images.size(0)
+            images = images.view(B, -1)         # (B, 784)
+            #images = images[:, perm]            # (B, 784) permuted
+
+            # Forward
+            logits = model(images)
+            loss = criterion(logits, labels)
+
+            # Backward
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item() * B
+            print (f"Running loss = {running_loss}")
+            _, preds = logits.max(1)
+            correct += preds.eq(labels).sum().item()
+            total += B
+
+        avg_loss = running_loss / total
+        acc = correct / total * 100.0
+        #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+        print(f"Task  | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+
+        return model
+
+
+
+
+
+
 
         
 
@@ -42,11 +100,18 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 mlp = MLP().to(device)
 
 
-for image, label in train_loader:
-    batch_logits = mlp.forward(image)
-    predicted_classes = torch.argmax(batch_logits, dim=1)
-    print (predicted_classes)
+mlp = train_model(model=mlp, train_loader=train_loader)
+
+
+
+#for epochs in range(n_epochs):
+
+#    for image, label in train_loader:
+#        batch_logits = mlp.forward(image)
+#        predicted_classes = torch.argmax(batch_logits, dim=1)
+#        print (predicted_classes)
    
+
    
     
 
