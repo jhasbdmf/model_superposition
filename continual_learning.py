@@ -8,7 +8,7 @@ import torch.optim as optim
 import torch.nn as nn
 from sklearn.decomposition import PCA
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 
 class MLP(nn.Module):
@@ -265,6 +265,16 @@ print (train_loss_history)
 print ("_"*50)
 
 print (penultimate_logits)
+
+plt.scatter(penultimate_logits[0, :, 0], penultimate_logits[0, :, 1], c='red', label='Class 1')
+plt.scatter(penultimate_logits[1, :, 0], penultimate_logits[1, :, 1], c='blue', label='Class 2')
+plt.scatter(penultimate_logits[2,:, 0], penultimate_logits[2, :, 1], c='green', label='Class 3')
+
+plt.legend()
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('Scatter plot of three arrays with different colors')
+plt.show()
 
 '''
 print ("SUPERPOSITION")
