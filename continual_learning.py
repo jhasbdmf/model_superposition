@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=128, hidden2=128, num_classes = 10):
+    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=32, hidden2=32, num_classes = 10):
 
 
         super().__init__()
@@ -46,7 +46,7 @@ class MLP(nn.Module):
         return logits
     
 
-def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
+def train_model (model, train_loader, test_loader, batch_size, n_epochs=1, n_tasks = 5):
 
     permutations = torch.stack([torch.randperm(model.input_dim) for _ in range(n_tasks)])
         
@@ -55,60 +55,88 @@ def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
     model.train()
 
 
-    n_epochs = 2
-
-
-
     criterion = nn.CrossEntropyLoss()
 
     train_loss_history = []
 
-    for t in range(n_tasks):
+    for run in range(2):
 
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-        for epoch in range(n_epochs):
-            running_loss = 0.0
-            correct = 0
-            total = 0
+        print ("_"*50)
+        print (f"Run {run+1}")
+        print ("_"*25)
 
-            for images, labels in train_loader:
-                images = images.to(device)   # (B, 1, 28, 28)
-                labels = labels.to(device)   # (B,)
+        for t in range(n_tasks):
 
-                # Flatten and permute pixels
-                B = images.size(0)
-                images = images.view(B, -1)         # (B, 784)
-                images = images[:, permutations[t]]            # (B, 784) permuted
+            optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-              
-             
-                logits = model(images, t)
-                loss = criterion(logits, labels)
+            for epoch in range(n_epochs):
+                running_loss = 0.0
+                correct = 0
+                total = 0
 
-                # Backward
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+                for images, labels in train_loader:
+                    images = images.to(device)   # (B, 1, 28, 28)
+                    labels = labels.to(device)   # (B,)
 
-                running_loss += loss.item() * B
-                #print (f"Running loss = {running_loss}")
-                _, preds = logits.max(1)
-                correct += preds.eq(labels).sum().item()
-                total += B
+                    # Flatten and permute pixels
+                    B = images.size(0)
+                    images = images.view(B, -1)         # (B, 784)
+                    images = images[:, permutations[t]]            # (B, 784) permuted
 
-            avg_loss = running_loss / total
-            train_loss_history.append (avg_loss)
-            acc = correct / total * 100.0
-            #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
-            print(f"Task {t+1} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
-        
+                
+                
+                    logits = model(images, t)
+                    loss = criterion(logits, labels)
+
+                    # Backward
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+
+                    running_loss += loss.item() * B
+                    #print (f"Running loss = {running_loss}")
+                    _, preds = logits.max(1)
+                    correct += preds.eq(labels).sum().item()
+                    total += B
+
+                avg_loss = running_loss / total
+                train_loss_history.append (avg_loss)
+                acc = correct / total * 100.0
+                #print(f"Task {task_id} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+                print(f"Task {t+1} | Epoch {epoch+1} | Loss: {avg_loss:.4f} | Acc: {acc:.2f}%")
+
+
+
+            # Inside the task loop, after training:
+            test_acc = evaluate(model, test_loader, permutations[t])
+            print(f"Task {t+1} | Test accuracy on its own permutation: {test_acc:.2f}%")
+            
     model.eval()
 
     return model, train_loss_history
 
 
 
+
+
+def evaluate(model, loader, perm):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for images, labels in loader:
+            images = images.to(device)
+            labels = labels.to(device)
+            B = images.size(0)
+            images = images.view(B, -1)
+            images = images[:, perm]
+
+            logits = model(images)
+            _, preds = logits.max(1)
+            correct += preds.eq(labels).sum().item()
+            total += B
+    return correct / total * 100.0
 
 
 
@@ -124,9 +152,18 @@ train_set = datasets.MNIST(
     transform=transforms.ToTensor()
 )
 
+test_set = datasets.MNIST(
+    root="./data",
+    train=False,
+    download=True,
+    transform=transforms.ToTensor()
+)
+
 batch_size = 32
 
-train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=False)
+train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+
+test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -138,6 +175,7 @@ mlp1 = MLP().to(device)
 
 mlp1, train_loss_history = train_model(model=mlp1, train_loader=train_loader, batch_size=batch_size)
 
+print ("_"*50)
 print (train_loss_history)
 
 print ("_"*50)
@@ -149,6 +187,7 @@ mlp2 = MLP(superposition=True).to(device)
 
 mlp2, train_loss_history = train_model(model=mlp2, train_loader=train_loader, batch_size=batch_size)
 
+print ("_"*50)
 print (train_loss_history)
 
 print ("_"*100)
@@ -171,12 +210,7 @@ print ("_"*100)
 #print (loader[1])
 
 
-test_set = datasets.MNIST(
-    root="./data",
-    train=False,
-    download=True,
-    transform=transforms.ToTensor()
-)
+
 
 print (type(test_set))
 print (type(test_set[0]))
