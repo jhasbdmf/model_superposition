@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torch.utils.data import Subset
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 
@@ -12,6 +13,19 @@ class MLP(nn.Module):
         self.fc1 = nn.Linear(input_dim, hidden1)
         self.fc2 = nn.Linear(hidden1, hidden2)
         self.fc_out = nn.Linear(hidden2, num_classes)
+
+    def forward(self, inputs, targets=None):
+
+        flattened_inputs = inputs.reshape(inputs.size(0),-1)
+        logits = F.relu(self.fc1(flattened_inputs))
+        logits = F.relu(self.fc2(logits))
+        logits = self.fc_out(logits)
+
+        return logits
+
+        
+
+      
 
     
 
@@ -35,14 +49,17 @@ train_loader = DataLoader(train_set, batch_size=32, shuffle=False)
 
 mlp = MLP()
 
-print(mlp.fc1.weight.shape)
 
-print(mlp.fc2.weight.shape)
-print(mlp.fc_out.weight.shape)
 
-#for image, label in train_loader:
-#    flattened_image = image.reshape(image.size(0),-1)
-#    print (flattened_image.shape, label.shape)
+
+
+for image, label in train_loader:
+    batch_logits = mlp.forward(image)
+    predicted_classes = torch.argmax(batch_logits, dim=1)
+    print (predicted_classes)
+    #flattened_image = image.reshape(image.size(0),-1)
+    #print (flattened_image.shape, label.shape)
+    
 
 #print (len(loader))
 
