@@ -25,13 +25,6 @@ class MLP(nn.Module):
 
         
 
-      
-
-    
-
-
-
-
 
 train_set = datasets.MNIST(
     root="./data",
@@ -42,23 +35,19 @@ train_set = datasets.MNIST(
 
 
 
-
-
-
 train_loader = DataLoader(train_set, batch_size=32, shuffle=False)
 
-mlp = MLP()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-
+mlp = MLP().to(device)
 
 
 for image, label in train_loader:
     batch_logits = mlp.forward(image)
     predicted_classes = torch.argmax(batch_logits, dim=1)
     print (predicted_classes)
-    #flattened_image = image.reshape(image.size(0),-1)
-    #print (flattened_image.shape, label.shape)
+   
+   
     
 
 #print (len(loader))
