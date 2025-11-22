@@ -10,18 +10,35 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-    def __init__(self, input_dim = 28*28, hidden1=256, hidden2=256, num_classes = 10):
+    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=256, hidden2=256, num_classes = 10):
+
+
         super().__init__()
+        self.superposition = superposition
         self.input_dim = input_dim
         self.fc1 = nn.Linear(input_dim, hidden1)
         self.fc2 = nn.Linear(hidden1, hidden2)
         self.fc_out = nn.Linear(hidden2, num_classes)
 
-    def forward(self, inputs, targets=None):
+        if superposition:
+            self.context1 = torch.randint(0, 2, (n_tasks, hidden1)) * 2 - 1
+            self.context2 = torch.randint(0, 2, (n_tasks, hidden2)) * 2 - 1
+
+    def forward(self, inputs, task_id=None, targets=None):
 
         flattened_inputs = inputs.reshape(inputs.size(0),-1)
         logits = F.relu(self.fc1(flattened_inputs))
+
+        #print (logits.shape)
+        if self.superposition:
+            logits = logits * self.context1[task_id]
+
         logits = F.relu(self.fc2(logits))
+
+        if self.superposition:
+            logits = logits * self.context2[task_id]
+
+
         logits = self.fc_out(logits)
 
         return logits
@@ -84,6 +101,7 @@ def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
     model.eval()
 
     return model, train_loss_history
+
 
 
 
