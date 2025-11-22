@@ -46,9 +46,9 @@ class MLP(nn.Module):
         return logits
     
 
-def train_model (model, train_loader, test_loader, batch_size, n_epochs=5, n_tasks = 10):
+def train_model (model, train_loader, test_loader, batch_size, permutations, n_epochs=2, n_tasks = 5):
 
-    permutations = torch.stack([torch.randperm(model.input_dim) for _ in range(n_tasks)])
+   
         
 
 
@@ -59,7 +59,7 @@ def train_model (model, train_loader, test_loader, batch_size, n_epochs=5, n_tas
 
     train_loss_history = []
 
-    for run in range(2):
+    for run in range(1):
 
 
         print ("_"*50)
@@ -160,6 +160,11 @@ test_set = datasets.MNIST(
 )
 
 batch_size = 128
+n_tasks = 10
+input_dim = 784
+
+
+permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
 
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 
@@ -173,10 +178,21 @@ print ("NO SUPERPOSITION")
 mlp1 = MLP().to(device)
 
 
-mlp1, train_loss_history = train_model(model=mlp1, train_loader=train_loader, test_loader=test_loader, batch_size=batch_size)
+mlp1, train_loss_history = train_model(model=mlp1, 
+                                       train_loader=train_loader, 
+                                       test_loader=test_loader, 
+                                       permutations=permutations,
+                                       batch_size=batch_size, 
+                                       n_tasks = n_tasks)
 
 print ("_"*50)
 print (train_loss_history)
+
+print ("_"*50)
+
+
+for i in range(n_tasks):
+    evaluate(mlp1, test_loader, permutations, i)
 
 print ("_"*50)
 
@@ -185,10 +201,21 @@ print ("SUPERPOSITION")
 mlp2 = MLP(superposition=True).to(device)
 
 
-mlp2, train_loss_history = train_model(model=mlp2, train_loader=train_loader, test_loader=test_loader, batch_size=batch_size)
+mlp2, train_loss_history = train_model(model=mlp2, 
+                                       train_loader=train_loader, 
+                                       test_loader=test_loader, 
+                                       permutations=permutations,
+                                       batch_size=batch_size,
+                                       n_tasks = n_tasks)
 
 print ("_"*50)
 print (train_loss_history)
+
+print ("_"*50)
+
+
+for i in range(n_tasks):
+    evaluate(mlp2, test_loader, permutations, i)
 
 print ("_"*100)
 
