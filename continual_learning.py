@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=256, hidden2=256, num_classes = 10):
+    def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=128, hidden2=128, num_classes = 10):
 
 
         super().__init__()
@@ -50,7 +50,7 @@ def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
 
     permutations = torch.stack([torch.randperm(model.input_dim) for _ in range(n_tasks)])
         
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
 
     model.train()
 
@@ -64,6 +64,8 @@ def train_model (model, train_loader, batch_size, n_epochs=2, n_tasks = 5):
     train_loss_history = []
 
     for t in range(n_tasks):
+
+        optimizer = optim.Adam(model.parameters(), lr=0.001)
 
         for epoch in range(n_epochs):
             running_loss = 0.0
