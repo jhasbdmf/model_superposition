@@ -130,6 +130,8 @@ def train_model (model,
             
 
             if t==0 or t==5 or t==9:
+
+                """
                 for images, labels in pca_instances_loader:
                     _, batch_logits_penultimate = model.forward(inputs = images, 
                                                                 task_id = t,
@@ -139,7 +141,19 @@ def train_model (model,
 
 
                     batch_penultimate_infos.append((batch_logits_penultimate_pca, labels))
-                
+                """
+
+                with torch.no_grad():
+                    for images, true_labels in test_loader:  # true task labels
+                        images = images.to(device)
+                        B = images.size(0)
+                        images_perm = images.view(B, -1)[:, permutations[t]]  # Task t permutation!
+                        
+                        _, penultimate = model(images_perm, t, get_penultimate_logits=True)
+                        penult_pca = apply_pca_to_batch(penultimate)  # [B, 2]
+                        
+                        #batch_penultimate_infos.append((penult_pca.cpu().numpy(), true_labels.cpu().numpy()))
+                        batch_penultimate_infos.append((penult_pca, true_labels.cpu().numpy()))
             #elif t==5:
             
             #elif t==9:
