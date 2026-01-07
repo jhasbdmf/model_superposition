@@ -6,7 +6,7 @@ from torch.utils.data import Subset
 
 
 
-import matplotlib.pyplot as plt
+
 
 from utilities import MLP, train_model, evaluate, run_experiment
 
@@ -53,11 +53,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   plt)
+                   #plt
+                   )
 
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   plt,
+                   #plt,
                    superposition=True)
 

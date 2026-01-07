@@ -4,7 +4,7 @@ import torch.optim as optim
 import torch
 from sklearn.decomposition import PCA
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class MLP(nn.Module):
     def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=128, hidden2=128, num_classes = 10):
@@ -206,7 +206,7 @@ def run_experiment(train_loader,
                    test_loader,
                    permutations,
                    #pca_instances_loader,
-                   plt,
+                   #plt,
                    batch_size = 32,
                    n_tasks = 10,
                    superposition = False):

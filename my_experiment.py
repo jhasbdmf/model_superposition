@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from utilities import MLP, train_model, evaluate
 
 
-fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
 
 
 train_set = datasets.MNIST(
