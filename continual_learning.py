@@ -14,33 +14,12 @@ from utilities import MLP, train_model, evaluate
 
 
 
-def get_PCA_instances_loader (train_set, positive_label = 1, negative_label = 0, n_samples_per_class = 10):
-    # Collect indices for 10 positive and 10 negative examples
-    positive_indices = []
-    negative_indices = []
 
-    for idx, (_, label) in enumerate(train_set):
-        if label == positive_label and len(positive_indices) < n_samples_per_class:
-            positive_indices.append(idx)
-        elif label == negative_label and len(negative_indices) < n_samples_per_class:
-            negative_indices.append(idx)
-
-        if len(positive_indices) == n_samples_per_class and len(negative_indices) == n_samples_per_class:
-            break
-
-    subset_indices = positive_indices + negative_indices
-
-    # Create subset and DataLoader to batch all 20 samples together
-    subset_train_set = Subset(train_set, subset_indices)
-    print (subset_train_set)
-    subset_loader = DataLoader(subset_train_set, batch_size=n_samples_per_class*2, shuffle=False)
-
-    return subset_loader
 
 def run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   pca_instances_loader,
+                   #pca_instances_loader,
                    plt,
                    batch_size = 32,
                    n_tasks = 10,
@@ -62,7 +41,7 @@ def run_experiment(train_loader,
                                         train_loader=train_loader, 
                                         test_loader=test_loader, 
                                         permutations=permutations,
-                                        pca_instances_loader=pca_instances_loader,
+                                        #pca_instances_loader=pca_instances_loader,
                                         batch_size=batch_size, 
                                         n_tasks = n_tasks)
 
@@ -150,7 +129,7 @@ train_set = datasets.MNIST(
 
 
 
-pca_instances_loader = get_PCA_instances_loader(train_set=train_set)
+#pca_instances_loader = get_PCA_instances_loader(train_set=train_set)
 #print (apply_pca_to_batch(pca_instances_loader))
 
 test_set = datasets.MNIST(
@@ -184,13 +163,13 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")\
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   pca_instances_loader,
+                   #pca_instances_loader,
                    plt)
 
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   pca_instances_loader,
+                   #pca_instances_loader,
                    plt,
                    superposition=True)
 
