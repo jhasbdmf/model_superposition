@@ -52,13 +52,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 run_experiment(train_loader,
                    test_loader,
-                   permutations,
-                   #plt
+                   permutations
                    )
 
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   #plt,
                    superposition=True)
 
