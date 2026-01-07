@@ -12,7 +12,7 @@ from utilities import MLP, train_model, run_experiment
 
 
 
-
+"""
 
 train_set = datasets.MNIST(
     root="./data",
@@ -75,7 +75,7 @@ input_dim = 1024
 
 
 permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
-"""
+
 
 
 run_experiment(train_loader,
