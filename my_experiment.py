@@ -23,7 +23,7 @@ train_set = datasets.MNIST(
 
 
 
-pca_instances_loader = get_PCA_instances_loader(train_set=train_set)
+
 #print (apply_pca_to_batch(pca_instances_loader))
 
 test_set = datasets.MNIST(
@@ -61,7 +61,6 @@ mlp1, train_loss_history, penultimate_logits = train_model(model=mlp1,
                                        train_loader=train_loader, 
                                        test_loader=test_loader, 
                                        permutations=permutations,
-                                       pca_instances_loader=pca_instances_loader,
                                        batch_size=batch_size, 
                                        n_tasks = n_tasks)
 
@@ -142,7 +141,7 @@ mlp2, train_loss_history, penultimate_logits = train_model(model=mlp2,
                                        train_loader=train_loader, 
                                        test_loader=test_loader, 
                                        permutations=permutations,
-                                       pca_instances_loader=pca_instances_loader,
+                                  
                                        batch_size=batch_size,
                                        n_tasks = n_tasks)
 

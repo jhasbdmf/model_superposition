@@ -41,7 +41,6 @@ def run_experiment(train_loader,
                                         train_loader=train_loader, 
                                         test_loader=test_loader, 
                                         permutations=permutations,
-                                        #pca_instances_loader=pca_instances_loader,
                                         batch_size=batch_size, 
                                         n_tasks = n_tasks)
 
@@ -114,12 +113,6 @@ def run_experiment(train_loader,
 
 
 
-
-
-        
-#fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-
-
 train_set = datasets.MNIST(
     root="./data",
     train=True,
@@ -129,8 +122,6 @@ train_set = datasets.MNIST(
 
 
 
-#pca_instances_loader = get_PCA_instances_loader(train_set=train_set)
-#print (apply_pca_to_batch(pca_instances_loader))
 
 test_set = datasets.MNIST(
     root="./data",
@@ -163,13 +154,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")\
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   #pca_instances_loader,
                    plt)
 
 run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   #pca_instances_loader,
                    plt,
                    superposition=True)
 
