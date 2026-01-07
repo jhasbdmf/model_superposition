@@ -117,7 +117,7 @@ def run_experiment(train_loader,
 
 
         
-fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+#fig, axes = plt.subplots(1, 2, figsize=(15, 6))
 
 
 train_set = datasets.MNIST(
