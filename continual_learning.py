@@ -51,7 +51,7 @@ def run_experiment(train_loader,
 
     print ("_"*50)
 
-    print (penultimate_logits)
+    #print (penultimate_logits)
 
     points0 = penultimate_logits[0][0]  # shape: [num_samples, 2]
     labels0 = penultimate_logits[0][1]
