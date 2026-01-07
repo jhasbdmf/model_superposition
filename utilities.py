@@ -205,8 +205,7 @@ def evaluate(model, loader, perm, task_id, device = torch.device("cuda" if torch
 def run_experiment(train_loader,
                    test_loader,
                    permutations,
-                   #pca_instances_loader,
-                   #plt,
+                   input_dim = 784, 
                    batch_size = 32,
                    n_tasks = 10,
                    superposition = False):
@@ -220,7 +219,7 @@ def run_experiment(train_loader,
     else:
         print ("NO SUPERPOSITION")
 
-    mlp1 = MLP(n_tasks=n_tasks, superposition=superposition).to(device)
+    mlp1 = MLP(superposition=superposition, n_tasks=n_tasks, input_dim=input_dim).to(device)
 
 
     mlp1, train_loss_history, penultimate_logits = train_model(model=mlp1, 
