@@ -215,15 +215,31 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
     return correct / total * 100.0
 
 
+#def run_experiment(train_loader,
+#                   test_loader,
+#                   permutations,
+#                   input_dim = 784, 
+#                   n_tasks = 10,
+#                   superposition = False):
+
 def run_experiment(train_loader,
                    test_loader,
-                   permutations,
+                   dataset_name = "MNIST",
                    input_dim = 784, 
                    n_tasks = 10,
                    superposition = False):
 
+
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    if dataset_name.upper() == "MNIST":
+        permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
+    elif dataset_name.upper() == "CIFAR":
+        permutations = None
+    else:
+        print ("Pass either MNIST or CIFAR as a dataset name for the run experiment method.")
+        return
 
     print ("_"*100)
     if superposition:

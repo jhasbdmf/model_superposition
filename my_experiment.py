@@ -78,23 +78,23 @@ print(f"Train batches: {len(train_loader)}, Classes: {train_set.classes}")
 
 
 #permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
-permutations = None
+#permutations = None
 
 
 run_experiment(train_loader=train_loader,
                    test_loader=test_loader,
-                   permutations=permutations,
+                   #permutations=permutations,
+                   dataset_name = "CIFAR",
                    input_dim=input_dim,
-            
                    n_tasks=n_tasks,
                    superposition = False
                    )
 
 run_experiment(train_loader=train_loader,
                    test_loader=test_loader,
-                   permutations=permutations,
+                   #permutations=permutations,
+                   dataset_name = "CIFAR",
                    input_dim=input_dim,
-                  
                    n_tasks=n_tasks,
                    superposition = True
                    )
