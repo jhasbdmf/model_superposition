@@ -227,7 +227,7 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
 def run_experiment(#train_loader,
                    #test_loader,
                    dataset_name = "MNIST",
-                   input_dim = 784, 
+                   #input_dim = 784, 
                    batch_size = 128,
                    n_tasks = 10,
                    superposition = False):
@@ -237,15 +237,15 @@ def run_experiment(#train_loader,
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if dataset_name.upper() == "MNIST":
+
+        input_dim = 28 * 28 * 1
+
         train_set = datasets.MNIST(
             root="./data",
             train=True,
             download=True,
             transform=transforms.ToTensor()
         )
-
-
-
 
         #print (apply_pca_to_batch(pca_instances_loader))
 
@@ -265,6 +265,8 @@ def run_experiment(#train_loader,
 
     elif dataset_name.upper() == "CIFAR":
 
+        input_dim = 32 * 32 * 3
+
         transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))  # CIFAR-10 mean/std
@@ -275,8 +277,6 @@ def run_experiment(#train_loader,
 
         train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0)
         test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0)
-
-      
 
 
         permutations = None

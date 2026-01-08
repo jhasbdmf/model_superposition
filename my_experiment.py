@@ -85,7 +85,7 @@ run_experiment(#train_loader=train_loader,
                    #test_loader=test_loader,
                    #permutations=permutations,
                    dataset_name = "CIFAR",
-                   input_dim=input_dim,
+                   #input_dim=input_dim,
                    n_tasks=n_tasks,
                    superposition = False
                    )
@@ -94,7 +94,7 @@ run_experiment(#train_loader=train_loader,
                    #test_loader=test_loader,
                    #permutations=permutations,
                    dataset_name = "CIFAR",
-                   input_dim=input_dim,
+                   #input_dim=input_dim,
                    n_tasks=n_tasks,
                    superposition = True
                    )
