@@ -81,20 +81,14 @@ test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_wor
 #permutations = None
 
 
-run_experiment(#train_loader=train_loader,
-                   #test_loader=test_loader,
-                   #permutations=permutations,
-                   dataset_name = "CIFAR",
-                   #input_dim=input_dim,
+run_experiment(dataset_name = "CIFAR",
+                   image_rotation_angle_per_task = 10,
                    n_tasks=n_tasks,
                    superposition = False
                    )
 
-run_experiment(#train_loader=train_loader,
-                   #test_loader=test_loader,
-                   #permutations=permutations,
-                   dataset_name = "CIFAR",
-                   #input_dim=input_dim,
+run_experiment(dataset_name = "CIFAR",
+                   image_rotation_angle_per_task = 10,
                    n_tasks=n_tasks,
                    superposition = True
                    )
