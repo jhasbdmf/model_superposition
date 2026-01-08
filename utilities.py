@@ -239,7 +239,7 @@ def run_experiment(#train_loader,
                    dataset_name = "MNIST",
                    #input_dim = 784, 
                    batch_size = 128,
-                   n_tasks = 10,
+                   n_tasks = 5,
                    superposition = False):
 
 
