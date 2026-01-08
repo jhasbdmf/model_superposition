@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.transforms.functional as T
 import torch.optim as optim
 import torch
 from sklearn.decomposition import PCA
@@ -103,11 +104,15 @@ def train_model (model,
 
                     # Flatten and permute pixels
                     B = images.size(0)
-                    images = images.view(B, -1)
+                    #images = images.view(B, -1)
                                         
                                         
-                    if permutations is not None:                                     # (B, 784)
-                        images = images[:, permutations[t]]            # (B, 784) permuted
+                    if permutations is not None:     
+                        images = images.view(B, -1)         # (B, 784)
+                        images = images[:, permutations[t]]     
+                    else:
+                        images = T.rotate(images, angle = 360*t/n_tasks)  
+                        images = images.view(B, -1)                                                 # (B, 784) permuted
 
                 
                 
@@ -152,11 +157,16 @@ def train_model (model,
                     for images, true_labels in test_loader:  # true task labels
                         images = images.to(device)
                         B = images.size(0)
-                        images_flattened = images.view(B, -1)
+                        #images_flattened = images.view(B, -1)
                         if permutations is not None:
+                            images_flattened = images.view(B, -1)
                             images_perm = images_flattened[:, permutations[t]]
                         else:
-                            images_perm = images_flattened
+                            
+                            images_perm = T.rotate(images, angle = 360*t/n_tasks)
+                            images_perm = images_perm.view(B, -1)
+                            #images_perm = images_flattened
+
                         #images_perm = images.view(B, -1)[:, permutations[t]]  # Task t permutation!
                         
                         _, penultimate = model(images_perm, t, get_penultimate_logits=True)
