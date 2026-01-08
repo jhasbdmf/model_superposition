@@ -99,6 +99,9 @@ def train_model (model,
 
         for t in range(n_tasks):
 
+            if image_rotation_angle_per_task is not None:
+                current_rotation_angle = image_rotation_angle_per_task * t
+
             optimizer = optim.Adam(model.parameters(), lr=0.001)
 
             for epoch in range(n_epochs):
@@ -122,7 +125,7 @@ def train_model (model,
                         images = images.view(B, -1)         # (B, 784)
                         images = images[:, permutations[t]]     
                     else:
-                        images = T.rotate(images, angle = image_rotation_angle_per_task*t)  
+                        images = T.rotate(images, angle = current_rotation_angle)  
                         images = images.view(B, -1)                                                 # (B, 784) permuted
 
                 
@@ -174,7 +177,7 @@ def train_model (model,
                             images_perm = images_flattened[:, permutations[t]]
                         else:
                             
-                            images_perm = T.rotate(images, angle = 360*t/n_tasks)
+                            images_perm = T.rotate(images, angle = current_rotation_angle)
                             images_perm = images_perm.view(B, -1)
                             #images_perm = images_flattened
 
