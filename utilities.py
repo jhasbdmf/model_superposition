@@ -102,8 +102,11 @@ def train_model (model,
 
                     # Flatten and permute pixels
                     B = images.size(0)
-                    images = images.view(B, -1)         # (B, 784)
-                    images = images[:, permutations[t]]            # (B, 784) permuted
+                    images = images.view(B, -1)
+                                        
+                                        
+                    if permutations is not None:                                     # (B, 784)
+                        images = images[:, permutations[t]]            # (B, 784) permuted
 
                 
                 
@@ -148,7 +151,12 @@ def train_model (model,
                     for images, true_labels in test_loader:  # true task labels
                         images = images.to(device)
                         B = images.size(0)
-                        images_perm = images.view(B, -1)[:, permutations[t]]  # Task t permutation!
+                        images_flattened = images.view(B, -1)
+                        if permutations is not None:
+                            images_perm = images_flattened[:, permutations[t]]
+                        else:
+                            images_perm = images_flattened
+                        #images_perm = images.view(B, -1)[:, permutations[t]]  # Task t permutation!
                         
                         _, penultimate = model(images_perm, t, get_penultimate_logits=True)
                         penult_pca = apply_pca_to_batch(penultimate)  # [B, 2]
@@ -161,7 +169,11 @@ def train_model (model,
 
 
             # Inside the task loop, after training:
-            test_acc = evaluate(model, test_loader, permutations[0], 0)
+            if permutations is not None:
+                test_acc = evaluate(model=model, loader=test_loader, task_id=0, perm=permutations[0])
+            else:
+                #test_acc = evaluate(model, test_loader, permutations[0], 0)
+                test_acc = evaluate(model=model, loader=test_loader, task_id=0)
             print(f"Task {1} | Test accuracy on its own permutation: {test_acc:.2f}%")
             
     model.eval()
@@ -183,7 +195,7 @@ def apply_pca_to_batch(tensors, n_components=2):
 
 
 
-def evaluate(model, loader, perm, task_id, device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
     model.eval()
     correct = 0
     total = 0
@@ -193,7 +205,9 @@ def evaluate(model, loader, perm, task_id, device = torch.device("cuda" if torch
             labels = labels.to(device)
             B = images.size(0)
             images = images.view(B, -1)
-            images = images[:, perm]
+
+            if perm is not None:
+                images = images[:, perm]
 
             logits = model(images, task_id)
             _, preds = logits.max(1)
