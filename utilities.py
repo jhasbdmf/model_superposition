@@ -60,7 +60,6 @@ class MLP(nn.Module):
 def train_model (model,
                  train_loader,
                  test_loader,
-                 batch_size,
                  permutations,
                  pca_instances_loader=None,
                  n_epochs=1,
@@ -220,7 +219,6 @@ def run_experiment(train_loader,
                    test_loader,
                    permutations,
                    input_dim = 784, 
-                   batch_size = 32,
                    n_tasks = 10,
                    superposition = False):
 
@@ -240,7 +238,6 @@ def run_experiment(train_loader,
                                         train_loader=train_loader, 
                                         test_loader=test_loader, 
                                         permutations=permutations,
-                                        batch_size=batch_size, 
                                         n_tasks = n_tasks)
 
 
