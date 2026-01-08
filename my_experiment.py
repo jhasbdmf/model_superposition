@@ -71,7 +71,7 @@ print(f"Train batches: {len(train_loader)}, Classes: {train_set.classes}")
 
 batch_size = 128
 n_tasks = 1
-input_dim = 1024
+input_dim = 3072
 
 
 #permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
