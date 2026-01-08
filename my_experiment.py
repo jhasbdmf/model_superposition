@@ -74,15 +74,15 @@ input_dim = 3072
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0)
 test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0)
 
-print(f"Train batches: {len(train_loader)}, Classes: {train_set.classes}")
+#print(f"Train batches: {len(train_loader)}, Classes: {train_set.classes}")
 
 
 #permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
 #permutations = None
 
 
-run_experiment(train_loader=train_loader,
-                   test_loader=test_loader,
+run_experiment(#train_loader=train_loader,
+                   #test_loader=test_loader,
                    #permutations=permutations,
                    dataset_name = "CIFAR",
                    input_dim=input_dim,
@@ -90,8 +90,8 @@ run_experiment(train_loader=train_loader,
                    superposition = False
                    )
 
-run_experiment(train_loader=train_loader,
-                   test_loader=test_loader,
+run_experiment(#train_loader=train_loader,
+                   #test_loader=test_loader,
                    #permutations=permutations,
                    dataset_name = "CIFAR",
                    input_dim=input_dim,

@@ -5,6 +5,8 @@ import torch
 from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
 
 class MLP(nn.Module):
     def __init__(self, superposition = False, n_tasks = 5, input_dim = 28*28, hidden1=128, hidden2=128, num_classes = 10):
@@ -222,10 +224,11 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
 #                   n_tasks = 10,
 #                   superposition = False):
 
-def run_experiment(train_loader,
-                   test_loader,
+def run_experiment(#train_loader,
+                   #test_loader,
                    dataset_name = "MNIST",
                    input_dim = 784, 
+                   batch_size = 128,
                    n_tasks = 10,
                    superposition = False):
 
@@ -234,13 +237,55 @@ def run_experiment(train_loader,
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if dataset_name.upper() == "MNIST":
+        train_set = datasets.MNIST(
+            root="./data",
+            train=True,
+            download=True,
+            transform=transforms.ToTensor()
+        )
+
+
+
+
+        #print (apply_pca_to_batch(pca_instances_loader))
+
+        test_set = datasets.MNIST(
+            root="./data",
+            train=False,
+            download=True,
+            transform=transforms.ToTensor()
+        )
+
+
+        train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+        test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
+
         permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
+
+
     elif dataset_name.upper() == "CIFAR":
+
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))  # CIFAR-10 mean/std
+        ])
+
+        train_set = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+        test_set = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+
+        train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0)
+        test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0)
+
+      
+
+
         permutations = None
     else:
         print ("Pass either MNIST or CIFAR as a dataset name for the run experiment method.")
         return
 
+
+    print(f"Dataset: {dataset_name}, Train batches: {len(train_loader)}, Classes: {train_set.classes}")
     print ("_"*100)
     if superposition:
         print ("SUPERPOSITION")
