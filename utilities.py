@@ -65,7 +65,7 @@ def train_model (model,
                  test_loader,
                  permutations,
                  pca_instances_loader=None,
-                 n_epochs=1,
+                 n_epochs=3,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
 
@@ -111,7 +111,7 @@ def train_model (model,
                         images = images.view(B, -1)         # (B, 784)
                         images = images[:, permutations[t]]     
                     else:
-                        images = T.rotate(images, angle = 360*t/n_tasks)  
+                        images = T.rotate(images, angle = 10*t)  
                         images = images.view(B, -1)                                                 # (B, 784) permuted
 
                 
