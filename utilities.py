@@ -73,7 +73,7 @@ def train_model (model,
                  train_loader,
                  test_loader,
                  permutations,
-                 pca_instances_loader=None,
+                 image_rotation_angle_per_task = 0,
                  n_epochs=1,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
@@ -122,7 +122,7 @@ def train_model (model,
                         images = images.view(B, -1)         # (B, 784)
                         images = images[:, permutations[t]]     
                     else:
-                        images = T.rotate(images, angle = 10*t)  
+                        images = T.rotate(images, angle = image_rotation_angle_per_task*t)  
                         images = images.view(B, -1)                                                 # (B, 784) permuted
 
                 
@@ -247,10 +247,12 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
 #                   n_tasks = 10,
 #                   superposition = False):
 
-def run_experiment(#train_loader,
-                   #test_loader,
-                   dataset_name = "MNIST",
-                   #input_dim = 784, 
+
+#image_rotation_angle_per_task = None means that 
+#images are to be randomly permuted 
+#rather than rotated between tasks
+def run_experiment(dataset_name = "MNIST",
+                   image_rotation_angle_per_task = None,
                    batch_size = 128,
                    n_tasks = 5,
                    superposition = False):
@@ -284,7 +286,7 @@ def run_experiment(#train_loader,
         train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
-        permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
+        #permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
 
 
     elif dataset_name.upper() == "CIFAR":
@@ -304,11 +306,19 @@ def run_experiment(#train_loader,
         test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0)
 
 
-        permutations = None
+        #permutations = None
     else:
         print ("Pass either MNIST or CIFAR as a dataset name for the run experiment method.")
         return
 
+    #if image rotation angle is none, then images are to be randomly permuted across tasks
+    if image_rotation_angle_per_task is None:
+        permutations = torch.stack([torch.randperm(input_dim) for _ in range(n_tasks)])
+
+    #of image rotation angle is given, then no random image permutations are necessary
+    else:
+        permutations = None
+        
 
     print(f"Dataset: {dataset_name}, Train batches: {len(train_loader)}, Classes: {train_set.classes}")
     print ("_"*100)
@@ -324,6 +334,7 @@ def run_experiment(#train_loader,
                                         train_loader=train_loader, 
                                         test_loader=test_loader, 
                                         permutations=permutations,
+                                        image_rotation_angle_per_task = image_rotation_angle_per_task,
                                         n_tasks = n_tasks)
 
 
