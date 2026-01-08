@@ -249,6 +249,7 @@ def run_experiment(#train_loader,
     if dataset_name.upper() == "MNIST":
 
         input_dim = 28 * 28 * 1
+        hidden_dim = 128
 
         train_set = datasets.MNIST(
             root="./data",
@@ -276,6 +277,7 @@ def run_experiment(#train_loader,
     elif dataset_name.upper() == "CIFAR":
 
         input_dim = 32 * 32 * 3
+        hidden_dim = 512
 
         transform = transforms.Compose([
             transforms.ToTensor(),
@@ -302,7 +304,7 @@ def run_experiment(#train_loader,
     else:
         print ("NO SUPERPOSITION")
 
-    mlp1 = MLP(superposition=superposition, n_tasks=n_tasks, input_dim=input_dim).to(device)
+    mlp1 = MLP(superposition=superposition, n_tasks=n_tasks, input_dim=input_dim, hidden1=hidden_dim, hidden2=hidden_dim).to(device)
 
 
     mlp1, train_loss_history, penultimate_logits = train_model(model=mlp1, 
