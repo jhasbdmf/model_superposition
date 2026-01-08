@@ -65,7 +65,7 @@ def train_model (model,
                  test_loader,
                  permutations,
                  pca_instances_loader=None,
-                 n_epochs=3,
+                 n_epochs=1,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
 
@@ -76,6 +76,8 @@ def train_model (model,
     criterion = nn.CrossEntropyLoss()
 
     train_loss_history = []
+
+    first_task_acc_history = []
 
     batch_penultimate_infos = []
 
@@ -186,10 +188,12 @@ def train_model (model,
                 #test_acc = evaluate(model, test_loader, permutations[0], 0)
                 test_acc = evaluate(model=model, loader=test_loader, task_id=0)
             print(f"Task {1} | Test accuracy on its own permutation: {test_acc:.2f}%")
+            first_task_acc_history.append(test_acc)
             
     model.eval()
 
-    return model, train_loss_history, batch_penultimate_infos
+    #return model, train_loss_history, batch_penultimate_infos
+    return model, first_task_acc_history, batch_penultimate_infos
 
 
 def apply_pca_to_batch(tensors, n_components=2):
@@ -307,7 +311,7 @@ def run_experiment(#train_loader,
     mlp1 = MLP(superposition=superposition, n_tasks=n_tasks, input_dim=input_dim, hidden1=hidden_dim, hidden2=hidden_dim).to(device)
 
 
-    mlp1, train_loss_history, penultimate_logits = train_model(model=mlp1, 
+    mlp1, first_task_acc_history, penultimate_logits = train_model(model=mlp1, 
                                         train_loader=train_loader, 
                                         test_loader=test_loader, 
                                         permutations=permutations,
@@ -315,7 +319,7 @@ def run_experiment(#train_loader,
 
 
     print ("_"*50)
-    print (train_loss_history)
+    print (first_task_acc_history)
 
 
     print ("_"*50)
@@ -380,3 +384,4 @@ def run_experiment(#train_loader,
     plt.title('Scatter plot of three arrays with different colors')
     plt.show()
 
+    return first_task_acc_history
