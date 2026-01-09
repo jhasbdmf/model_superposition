@@ -1,16 +1,6 @@
 from utilities import run_experiment
-
+import torch
 from itertools import product
-
-import matplotlib.pyplot as plt
-import numpy as np
-from datetime import datetime
-import os
-
-import matplotlib.pyplot as plt
-import numpy as np
-from datetime import datetime
-import os
 
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
@@ -85,6 +75,8 @@ def plot_combined_losses(results_dict, save_dir='plots'):
     plt.show()
     return fig
 
+
+print("cuda is available: ", torch.cuda.is_available())
 
 
 n_tasks = 10
