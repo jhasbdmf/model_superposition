@@ -199,7 +199,7 @@ def train_model (model,
             else:
                 #test_acc = evaluate(model, test_loader, permutations[0], 0)
                 test_acc = evaluate(model=model, loader=test_loader, task_id=0)
-            print(f"Task {1} | Test accuracy on its own permutation: {test_acc:.2f}%")
+            print(f"Task {1} | Test accuracy on the current model on the original task: {test_acc:.2f}%")
             first_task_acc_history.append(test_acc)
             
     model.eval()
