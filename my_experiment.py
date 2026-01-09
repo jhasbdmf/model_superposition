@@ -1,12 +1,93 @@
-import matplotlib.pyplot as plt
-
 from utilities import run_experiment
 
 from itertools import product
 
+import matplotlib.pyplot as plt
+import numpy as np
+from datetime import datetime
+import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+from datetime import datetime
+import os
+
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+import numpy as np
+from datetime import datetime
+import os
+
+def plot_combined_losses(results_dict, save_dir='plots'):
+    """
+    Superposition → linestyle (True=solid, False=dashed)
+    Angle → color (None=blue, 15=orange, 45=red)
+    First history=MNIST, second=CIFAR per condition
+    """
+    os.makedirs(save_dir, exist_ok=True)
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    # Maps
+    linestyle_map = {True: '-', False: '--'}
+    color_map = {None: 'blue', 15: 'orange', 45: 'red'}
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+
+    # Track for legend
+    mnist_lines = []
+    cifar_lines = []
+
+    for (superpos, angle), histories in results_dict.items():
+        mnist_losses, cifar_losses = histories
+        cond_name = f'S={superpos}, A={angle or "None"}'
+        ls = linestyle_map[superpos]
+        color = color_map.get(angle, 'gray')
+
+        # MNIST (circles)
+        line1, = ax1.plot(mnist_losses, ls=ls, color=color, marker='o', 
+                          linewidth=2.5, markersize=6)
+        mnist_lines.append(line1)
+        
+        # CIFAR (squares)
+        line2, = ax2.plot(cifar_losses, ls=ls, color=color, marker='s', 
+                          linewidth=2.5, markersize=6)
+        cifar_lines.append(line2)
+
+    # Axes
+    ax1.set_title('MNIST')
+    ax1.set_xlabel('Task number')
+    ax1.set_ylabel('Accuracy of a model on the original task')
+    ax1.grid(True, alpha=0.3)
+    
+    ax2.set_title('CIFAR')
+    ax2.set_xlabel('Task number')
+    ax2.set_ylabel('Accuracy of a model on the original task')
+    ax2.grid(True, alpha=0.3)
+
+    # Custom legend with solid/dashed distinction
+    legend_elements = [
+        mlines.Line2D([], [], color='blue', ls='-', marker='o', label='S=True, A=None'),
+        mlines.Line2D([], [], color='orange', ls='-', marker='o', label='S=True, A=15'), 
+        mlines.Line2D([], [], color='red', ls='-', marker='o', label='S=True, A=45'),
+        mlines.Line2D([], [], color='blue', ls='--', marker='o', label='S=False, A=None'),
+        mlines.Line2D([], [], color='orange', ls='--', marker='o', label='S=False, A=15'),
+        mlines.Line2D([], [], color='red', ls='--', marker='o', label='S=False, A=45'),
+    ]
+    
+    ax1.legend(handles=legend_elements, loc='upper right')
+    ax2.legend(handles=legend_elements, loc='upper right')
+
+    plt.tight_layout()
+    
+    filename = f'{save_dir}/combined_losses_{timestamp}.png'
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    print(f'Saved: {filename}')
+    plt.show()
+    return fig
 
 
-n_tasks = 2
+
+n_tasks = 10
 
 
 #run with mnist, cifar, perm, diff rotation angles. with and without superposition. display all acc histories
@@ -17,12 +98,17 @@ superposition_options = [True, False]
 
 #rotation angle of None means a permutation instead of rotation
 rotation_angles = [None, 15, 45]
+#rotation_angles = [None, 15]
+
+
 
 experimental_conditions = list(product(superposition_options, rotation_angles))
 
 #print (experimental_conditions)
 
 accuracy_histories_of_experimental_conditions = {}
+
+
 
 for experimental_condition in experimental_conditions:
     superposition = experimental_condition[0]
@@ -54,6 +140,11 @@ for experimental_condition in experimental_conditions:
     accuracy_histories_of_experimental_conditions[experimental_condition] = [mnist_acc_hist, cifar_acc_hist]
 
 print (accuracy_histories_of_experimental_conditions)
+
+
+
+plot_combined_losses(accuracy_histories_of_experimental_conditions)
+
 
 
 

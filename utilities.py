@@ -74,7 +74,7 @@ def train_model (model,
                  test_loader,
                  permutations,
                  image_rotation_angle_per_task = 0,
-                 n_epochs=1,
+                 n_epochs=3,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
 
@@ -405,6 +405,6 @@ def run_experiment(dataset_name = "MNIST",
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Scatter plot of three arrays with different colors')
-    plt.show()
+    #plt.show()
 
     return first_task_acc_history
