@@ -8,6 +8,75 @@ import numpy as np
 from datetime import datetime
 import os
 
+def plot_combined_losses(results_dict, rotation_angles=[None, 10, 15, 20, 36], save_dir='plots'):
+    """
+    Superposition → linestyle (True=solid, False=dashed)
+    Angle → color + marker (auto-cycling)
+    First history=MNIST, second=CIFAR per condition
+    """
+    os.makedirs(save_dir, exist_ok=True)
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    # Maps
+    linestyle_map = {True: '-', False: '--'}
+    
+    # Auto-color + marker cycle for angles
+    colors = plt.cm.viridis(np.linspace(0, 1, len(rotation_angles)))
+    markers = ['o', 's', '^', 'D', 'v', 'p', 'P', '*'][:len(rotation_angles)]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+
+    # Track for legend
+    legend_elements = []
+    plotted_conditions = set()
+
+    for (superpos, angle), histories in results_dict.items():
+        if angle not in rotation_angles: continue
+            
+        mnist_losses, cifar_losses = histories
+        cond_name = f'S={superpos}, A={angle or "None"}'
+        ls = linestyle_map[superpos]
+        
+        # Get color/marker by angle index
+        angle_idx = rotation_angles.index(angle)
+        color = colors[angle_idx]
+        marker = markers[angle_idx]
+
+        # MNIST (first task)
+        line1, = ax1.plot(mnist_losses, ls=ls, color=color, marker=marker, 
+                         linewidth=2.5, markersize=6, label=cond_name)
+        
+        # CIFAR (second task)  
+        line2, = ax2.plot(cifar_losses, ls=ls, color=color, marker=marker, 
+                         linewidth=2.5, markersize=6)
+
+        # Legend only once per condition
+        if cond_name not in plotted_conditions:
+            legend_elements.append(line1)
+            plotted_conditions.add(cond_name)
+
+    # Axes
+    ax1.set_title('MNIST')
+    ax1.set_xlabel('Task number')
+    ax1.set_ylabel('Accuracy of a model on the original task')
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(handles=legend_elements, loc='upper right')
+    
+    ax2.set_title('CIFAR')
+    ax2.set_xlabel('Task number')
+    ax2.set_ylabel('Accuracy of a model on the original task')
+    ax2.grid(True, alpha=0.3)
+    ax2.legend(handles=legend_elements, loc='upper right')
+
+    plt.tight_layout()
+    
+    filename = f'{save_dir}/combined_losses_{timestamp}.png'
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    print(f'Saved: {filename}')
+    plt.show()
+
+'''
+
 def plot_combined_losses(results_dict, save_dir='plots'):
     """
     Superposition → linestyle (True=solid, False=dashed)
@@ -74,12 +143,12 @@ def plot_combined_losses(results_dict, save_dir='plots'):
     print(f'Saved: {filename}')
     plt.show()
     return fig
-
+'''
 
 print("cuda is available: ", torch.cuda.is_available())
 
 
-n_tasks = 10
+n_tasks = 3
 
 
 #run with mnist, cifar, perm, diff rotation angles. with and without superposition. display all acc histories

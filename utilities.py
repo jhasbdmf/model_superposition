@@ -79,7 +79,7 @@ def train_model (model,
                  test_loader,
                  permutations,
                  image_rotation_angle_per_task = 0,
-                 n_epochs=3,
+                 n_epochs=1,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
 
@@ -268,7 +268,7 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
 #rather than rotated between tasks
 def run_experiment(dataset_name = "MNIST",
                    image_rotation_angle_per_task = None,
-                   batch_size = 1024,
+                   batch_size = 850,
                    n_tasks = 5,
                    superposition = False):
 
