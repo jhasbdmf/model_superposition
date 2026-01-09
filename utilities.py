@@ -78,8 +78,15 @@ def train_model (model,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
 
+
+
    
     model.train()
+
+    # Model device
+    print(f"Model device: {next(model.parameters()).device}")
+
+
 
 
     criterion = nn.CrossEntropyLoss()
@@ -256,7 +263,7 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
 #rather than rotated between tasks
 def run_experiment(dataset_name = "MNIST",
                    image_rotation_angle_per_task = None,
-                   batch_size = 2048,
+                   batch_size = 512,
                    n_tasks = 5,
                    superposition = False):
 
