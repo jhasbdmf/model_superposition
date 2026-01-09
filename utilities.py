@@ -51,7 +51,10 @@ class MLP(nn.Module):
         logits = F.relu(self.fc2(logits))
 
         if self.superposition:
-            logits = logits * self.context2[task_id]
+            ctx2 = self.context2.to(inputs.device)
+            logits = logits * ctx2[task_id]
+            
+            #logits = logits * self.context2[task_id]
 
         if not get_penultimate_logits:
 
