@@ -256,7 +256,7 @@ def evaluate(model, loader, task_id, perm = None, device = torch.device("cuda" i
 #rather than rotated between tasks
 def run_experiment(dataset_name = "MNIST",
                    image_rotation_angle_per_task = None,
-                   batch_size = 1024,
+                   batch_size = 2048,
                    n_tasks = 5,
                    superposition = False):
 
