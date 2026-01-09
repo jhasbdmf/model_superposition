@@ -44,7 +44,9 @@ class MLP(nn.Module):
         if self.superposition:
             #print (logits.shape)
             #print (self.context1.shape)
-            logits = logits * self.context1[task_id]
+            ctx1 = self.context1.to(inputs.device)
+            logits = logits * ctx1[task_id]
+            #logits = logits * self.context1[task_id]
 
         logits = F.relu(self.fc2(logits))
 
