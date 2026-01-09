@@ -97,7 +97,7 @@ n_tasks = 10
 superposition_options = [True, False]
 
 #rotation angle of None means a permutation instead of rotation
-rotation_angles = [None, 15, 45]
+rotation_angles = [None, 10, 15, 20, 36]
 #rotation_angles = [None, 15]
 
 
