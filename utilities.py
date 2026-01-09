@@ -79,7 +79,7 @@ def train_model (model,
                  test_loader,
                  permutations,
                  image_rotation_angle_per_task = 0,
-                 n_epochs=1,
+                 n_epochs=2,
                  n_tasks = 5,
                  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
 

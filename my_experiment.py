@@ -148,7 +148,7 @@ def plot_combined_losses(results_dict, save_dir='plots'):
 print("cuda is available: ", torch.cuda.is_available())
 
 
-n_tasks = 3
+n_tasks = 10
 
 
 #run with mnist, cifar, perm, diff rotation angles. with and without superposition. display all acc histories
