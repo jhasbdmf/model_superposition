@@ -70,11 +70,11 @@ The y-axis shows the accuracy of the model on the **original task** (task 0) as 
 
 ### MNIST
 
-![MNIST: accuracy on the original task as further tasks are learned](figures/mnist.png)
+![MNIST: accuracy on the original task as further tasks are learned](plots/MNIST.png)
 
 ### CIFAR-10
 
-![CIFAR: accuracy on the original task as further tasks are learned](figures/cifar.png)
+![CIFAR: accuracy on the original task as further tasks are learned](plots/CIFAR.png)
 
 ### Observations
 
