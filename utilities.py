@@ -417,6 +417,6 @@ def run_experiment(dataset_name = "MNIST",
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Scatter plot of three arrays with different colors')
-    #plt.show()
+    plt.show()
 
     return first_task_acc_history
